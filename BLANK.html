@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moysan Web</title>
+  <style>
+    body {
+      margin: 0;
+      font-family:cursive;
+    }
+    
+    .moysan {
+      background-image: url('front.jpeg');
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      height: 600px;
+      width: 100%;
+    }
+
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: none;
+      padding: 10px 20px;
+      color: white;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .menu {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 0 15px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+
+    .menu a:hover {
+      color: #ff9800;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    .eyes-container {
+      display: flex;
+      gap: 17px;
+      justify-content: center;
+      margin-top: 125px;
+      margin-left: 20px;
+    }
+
+    .eye {
+      width: 26px;
+      height: 26px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      border: 1px solid #000;
+      overflow: hidden;
+    }
+
+    .pupil {
+      width: 16px;
+      height: 16px;
+      background: black;
+      border-radius: 50%;
+      position: absolute;
+    }
+    
+    .eyelid {
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      transition: top 0.3s ease;
+    }
+
+    .eye.blink .eyelid {
+      top: 0;
+    }
+
+    /* changing text */
+    .bottom {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #222;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 310px;
+      margin: 0;
+    }
+
+    .container {
+      font-size: 2rem;
+      white-space: nowrap;
+    }
+
+    #text {
+      display: inline-block;
+      border-right: 2px solid white;
+      padding-right: 5px;
+      animation: blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes blink-caret {
+      0% {
+        border-color: transparent;
+      }
+
+      50% {
+        border-color: white;
+      }
+
+      100% {
+        border-color: transparent;
+      }
+    }
+
+
+    @media (max-width: 768px) {
+      .menu {
+        display: none;
+        flex-direction: column;
+        background-color: #333;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        text-align: center;
+      }
+
+      .menu.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .menu li {
+        margin: 10px 0;
+      }
+      .logo{
+        font-size: 27px;
+      }
+      .eye{
+        width: 25px;
+        height: 25px;
+      }
+      .eyes-container {
+        margin-top: 120px;
+      }
+      .container{
+          font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="moysan">
+    <nav class="navbar">
+      <div class="logo">Moysan</div>
+      <ul class="menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="menu-toggle" id="menu-toggle">&#9776;</div>
+    </nav>
+    <hr>
+    <div class="top">
+
+      <div class="eyes-container">
+        <div class="eye">
+          <div class="pupil"></div>
+          <div class="eyelid"></div>
+        </div>
+        <div class="eye">
+          <div class="pupil"></div>
+          <div class="eyelid"></div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="bottom">
+    <div class="container">
+      <span id="text"></span>
+    </div>
+  </main>
+
+
+
+  <script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const menu = document.querySelector('.menu');
+
+    menuToggle.addEventListener('click', () => {
+      menu.classList.toggle('active');
+    });
+    // Moving Eyes
+    document.addEventListener('mousemove', (event) => {
+      const eyes = document.querySelectorAll('.eye');
+      const { clientX: mouseX, clientY: mouseY } = event;
+
+      eyes.forEach(eye => {
+        const rect = eye.getBoundingClientRect();
+        const eyeX = rect.left + rect.width / 2;
+        const eyeY = rect.top + rect.height / 2;
+
+        const deltaX = mouseX - eyeX;
+        const deltaY = mouseY - eyeY;
+        const angle = Math.atan2(deltaY, deltaX);
+
+        const pupil = eye.querySelector('.pupil');
+        const maxDistance = (rect.width / 2) - (pupil.offsetWidth / 2);
+        const distanceX = Math.cos(angle) * maxDistance;
+        const distanceY = Math.sin(angle) * maxDistance;
+
+        pupil.style.transform = `translate(${distanceX}px, ${distanceY}px)`;
+      });
+    });
+
+    // Blinking Effect
+    setInterval(() => {
+      const eyes = document.querySelectorAll('.eye');
+      eyes.forEach(eye => eye.classList.add('blink'));
+      setTimeout(() => {
+        eyes.forEach(eye => eye.classList.remove('blink'));
+      }, 200); // Duration of the blink
+    }, 5000); // Blink every 3 seconds
+
+
+
+
+    //chnging bottom text
+
+    const textElement = document.getElementById('text');
+    const words = ['You bring smile on one Face!', 'You are the charm of mine', 'You are the symbol of joy!', 'You are happiness it self', 'Keep smiling!'];
+    let wordIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+
+    function typeAndDelete() {
+      const currentWord = words[wordIndex];
+
+      if (deleting) {
+        if (charIndex > 0) {
+          charIndex--;
+          textElement.textContent = currentWord.substring(0, charIndex);
+        } else {
+          deleting = false;
+          wordIndex = (wordIndex + 1) % words.length; // Loop through the words
+        }
+      } else {
+        if (charIndex < currentWord.length) {
+          charIndex++;
+          textElement.textContent = currentWord.substring(0, charIndex);
+        } else {
+          deleting = true;
+        }
+      }
+
+      setTimeout(typeAndDelete, deleting ? 100 : 200);
+    }
+
+    // Start the typing and deleting cycle
+    typeAndDelete();
+
+  </script>
+</body>
+
+</html>
